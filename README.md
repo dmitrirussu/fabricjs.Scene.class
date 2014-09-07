@@ -42,7 +42,7 @@ Example of using:
 
 		var rect = new fabric.Rect({ width: 200, height: 50, fill: '#faa', rx: 10, ry: 10, left: 200, top: 150 });
 		var text = new fabric.Text('Do stuff with me!', { fontSize: 20, fontFamily: 'Georgia', left: 200, top: 150 });
-
+		var text2 = new fabric.Text('Do stuff with me!', { fontSize: 20, fontFamily: 'Georgia', left: 400, top: 250 });
 
 		var scene = new fabric.Scene([rect, text], {
 			left: 0,
@@ -52,6 +52,7 @@ Example of using:
 			selectable: true,
 			angle: 0});
 
+		scene.addObject(text2);
 
 		this.canvas.add(scene);
 
