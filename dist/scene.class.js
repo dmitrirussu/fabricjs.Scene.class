@@ -65,6 +65,7 @@
 			for(var i in this._objects) {
 				this._objects[i].left = this._objects[i].left + this.left;
 				this._objects[i].top = this._objects[i].top + this.top;
+
 				this._objects[i].originalObjectsOptions = {
 					left: this._objects[i].left,
 					top: this._objects[i].top,
