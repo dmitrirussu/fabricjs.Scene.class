@@ -131,14 +131,18 @@
 			for (var i = 0, len = this._objects.length; i < len; i++) {
 				this._objects[i].originalState = {};
 
-				console.log('OBJECT -> ' +  this._objects[i].type, this._getRotatedLeftTop(this._objects[i]));
+				var objectRotatedLeftTop = this._getRotatedLeftTop(this._objects[i]);
 
 
 				this._objects[i].left = ((this._objects[i].left - this.pLeft) + sceneOffsetLeft);
 				this._objects[i].top = ((this._objects[i].top - this.pTop) + sceneOffsetTop);
 
-				this._objects[i].angle = (this._objects[i].angle - this.pAngle) + sceneAngle;
+				console.log('OBJECT -> '+this._objects[i].type,
+					this._objects[i].left,
+					this._objects[i].top,
+					objectRotatedLeftTop);
 
+				this._objects[i].angle = (this._objects[i].angle - this.pAngle) + sceneAngle;
 				this._objects[i].scaleX = (this._objects[i].scaleX - this.pScaleX) + sceneScaleX;
 				this._objects[i].scaleY = (this._objects[i].scaleY - this.pScaleY) + sceneScaleY;
 
