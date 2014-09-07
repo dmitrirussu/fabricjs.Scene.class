@@ -119,19 +119,29 @@
 				sceneOffsetTop =  (this.top - this.originalOptions.top);
 			var sceneAngle = (this.angle - this.originalOptions.angle);
 
+			var sceneScaleX = (this.scaleX - this.originalOptions.scaleX),
+				sceneScaleY = (this.scaleY - this.originalOptions.scaleY);
+
+
+			console.log('Scene Left', this.pLeft);
+
 
 			this.clipTo && fabric.util.clipContext(this, ctx);
 
 			for (var i = 0, len = this._objects.length; i < len; i++) {
 				this._objects[i].originalState = {};
 
+				console.log('OBJECT -> ' +  this._objects[i].type, this._getRotatedLeftTop(this._objects[i]));
+
+
 				this._objects[i].left = ((this._objects[i].left - this.pLeft) + sceneOffsetLeft);
 				this._objects[i].top = ((this._objects[i].top - this.pTop) + sceneOffsetTop);
 
 				this._objects[i].angle = (this._objects[i].angle - this.pAngle) + sceneAngle;
 
-				this._objects[i].scaleX = this.scaleX;
-				this._objects[i].scaleY = this.scaleY;
+				this._objects[i].scaleX = (this._objects[i].scaleX - this.pScaleX) + sceneScaleX;
+				this._objects[i].scaleY = (this._objects[i].scaleY - this.pScaleY) + sceneScaleY;
+
 
 				this._objects[i].setCoords();
 				this._objects[i].render(ctx);
@@ -144,6 +154,11 @@
 
 			if ( this.pAngle !== sceneAngle ) {
 				this.pAngle = sceneAngle;
+			}
+
+			if ( this.pScaleX !== sceneScaleX || this.pScaleY !== sceneScaleY ) {
+				this.pScaleX = sceneScaleX;
+				this.pScaleY = sceneScaleY;
 			}
 
 			this.clipTo && ctx.restore();
