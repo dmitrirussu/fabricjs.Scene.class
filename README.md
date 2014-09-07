@@ -1,6 +1,9 @@
 fabricjs.Scene.class
 ==============
 
+	Scene is an object which include one or more objects each object can be moved and animated.
+	Also a Scene can be animated as an simple object which is inside of scene.
+
 Main Goals
 =============
 
