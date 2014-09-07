@@ -142,6 +142,7 @@
 					this._objects[i].top,
 					objectRotatedLeftTop);
 
+
 				this._objects[i].angle = (this._objects[i].angle - this.pAngle) + sceneAngle;
 				this._objects[i].scaleX = (this._objects[i].scaleX - this.pScaleX) + sceneScaleX;
 				this._objects[i].scaleY = (this._objects[i].scaleY - this.pScaleY) + sceneScaleY;
