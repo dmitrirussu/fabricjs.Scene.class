@@ -63,8 +63,8 @@
 		 */
 		saveOriginalObjectsOptions: function() {
 			for(var i in this._objects) {
-				this._objects[i].left = this._objects[i].left + this.left;
-				this._objects[i].top = this._objects[i].top + this.top;
+//				this._objects[i].left = this._objects[i].left + this.left;
+//				this._objects[i].top = this._objects[i].top + this.top;
 
 				this._objects[i].originalObjectsOptions = {
 					left: this._objects[i].left,
@@ -125,20 +125,23 @@
 				sceneScaleY = (this.scaleY - this.originalOptions.scaleY);
 
 
+			console.log('Scene Left', this.pLeft);
+
+
 			this.clipTo && fabric.util.clipContext(this, ctx);
 
 			for (var i = 0, len = this._objects.length; i < len; i++) {
 				this._objects[i].originalState = {};
+
+				var objectRotatedLeftTop = this._getRotatedLeftTop(this._objects[i]);
 
 
 
 				this._objects[i].left = ((this._objects[i].left - this.pLeft) + sceneOffsetLeft);
 				this._objects[i].top = ((this._objects[i].top - this.pTop) + sceneOffsetTop);
 
-				var objectRotatedLeftTop = this._getRotatedLeftTop(this._objects[i]);
 
 				console.log('OBJECT -> '+this._objects[i].type,
-					sceneAngle,
 					this._objects[i].left,
 					this._objects[i].top,
 					objectRotatedLeftTop);
@@ -203,7 +206,7 @@
 		/**
 		 * Set Animation Delay
 		 * @param delay
-		 * @returns {fabric.Scene}
+		 * @returns {fabric.SvgAnimation}
 		 */
 		setDelay: function(delay) {
 			this.delay = delay;
@@ -215,7 +218,7 @@
 	/**
 	 * Indicates that instances of this type are async
 	 * @static
-	 * @memberOf fabric.Scene
+	 * @memberOf fabric.SvgAnimation
 	 * @type Boolean
 	 * @default
 	 */
