@@ -7,6 +7,7 @@ Main Goals
  1. Object Moving on scene
  2. Scene Scaling
  3. Scene Rotating
+ 4. Scene Pattern (Responsive SVG, IMG, Simple fill color)
  5. Scene Animation (By Scene duration [(InTime, Delay), (OutTime, Delay)])
 
 Current Scene Problems
