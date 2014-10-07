@@ -6,7 +6,8 @@
 	'use strict';
 
 	var fabric = global.fabric || (global.fabric = { }),
-		extend = fabric.util.object.extend;
+		degreesToRadians = fabric.util.degreesToRadians,
+		object = fabric.util.object;
 
 	if (fabric.Scene) {
 		fabric.warn('fabric.Scene is already defined');
@@ -18,28 +19,36 @@
 	 * @class fabric.Scene
 	 * @extends fabric.Object
 	 * @see {@link fabric.Scene#initialize} for constructor definition */
-	fabric.Scene = fabric.util.createClass(fabric.Object, fabric.Collection, {
+	fabric.Scene = fabric.util.createClass(fabric.Object, {
 		type: 'scene',
+
+		backgroundColor: null,
+		backgroundSrc: null,
 
 		originalOptions: {left:0, top: 0, width: 0 , height: 0, angle: 0, scaleX: 1, scaleY: 1},
 
-		initialize: function(objects, options) {
-			options = options || { };
+		initialize: function(canvas, objects, options) {
+
+			if (canvas === undefined) {
+				fabric.warn('fabric.Scene missing canvas container');
+				return;
+			}
+
+			fabric.Object.prototype.canvas = canvas;
+
+			options = options || {};
 
 			this.saveSceneOriginalOptions(options);
 
 			this._objects = objects || [];
 
 			this.originalState = { };
-			this.callSuper('initialize');
-
-
-			if (options) {
-				extend(this, options);
-			}
+			this.callSuper('initialize', options);
 
 			this.setCoords();
 			this.saveOriginalObjectsOptions();
+
+			this.actions();
 		},
 
 		/**
@@ -64,8 +73,9 @@
 		saveOriginalObjectsOptions: function() {
 			for(var i in this._objects) {
 
-				this._objects[i].left = this._objects[i].left + this.left;
-				this._objects[i].top = this._objects[i].top + this.top;
+				this._objects[i].left += this.left;
+				this._objects[i].top += this.top;
+
 
 				this._objects[i].originalObjectsOptions = {
 					left: this._objects[i].left,
@@ -73,7 +83,6 @@
 					width: this._objects[i].width,
 					height: this._objects[i].height
 				};
-
 			}
 
 		},
@@ -84,10 +93,182 @@
 		 * @returns {fabric.Scene}
 		 */
 		addObject : function(object) {
-
 			this._objects.push(object);
 
 			return this;
+		},
+
+		actions: function() {
+			var _this = this;
+
+			this.on('object:moving', function(options){
+				_this.onMoving(options);
+			});
+
+			this.on('object:scaling', function(options){
+				_this.onScaling(options);
+			});
+
+			this.on('object:rotating', function(options){
+				_this.onRotation(options);
+			});
+		},
+
+		onMoving: function(options) {
+
+			if (options.target.type === this.type) {
+				var objectsLength = options.target._objects.length,
+					objects = options.target._objects;
+
+				if ( objectsLength ) {
+					var sceneOffsetLeft = (options.target.left - options.target.originalOptions.left),
+						sceneOffsetTop =  (options.target.top - options.target.originalOptions.top);
+
+					for(var i in options.target._objects) {
+						options.target._objects[i].left = (options.target._objects[i].left - options.target.pLeft) + sceneOffsetLeft;
+						options.target._objects[i].top = (options.target._objects[i].top - options.target.pTop) + sceneOffsetTop;
+					}
+
+					if ( options.target.pLeft !== sceneOffsetLeft || options.target.pTop !== sceneOffsetTop) {
+						options.target.pLeft = sceneOffsetLeft;
+						options.target.pTop = sceneOffsetTop;
+					}
+				}
+			}
+		},
+
+		onScaling: function(options) {
+			if (options.target.type === this.type) {
+				//Do Something
+				var objectsLength = options.target._objects.length,
+					objects = options.target._objects;
+
+				if ( objectsLength ) {
+
+					var sceneScaleX = (options.target.scaleX - options.target.originalOptions.scaleX),
+						sceneScaleY = (options.target.scaleY - options.target.originalOptions.scaleY);
+
+					for(var i in objects) {
+						//options.target._objects[i].left = this.oCoords.tl.x;
+						//options.target._objects[i].top = this.oCoords.tl.y;
+						//options.target._objects[i].left = options.target.left + (options.target._objects[i].originalObjectsOptions.left * (options.target.scaleX));
+						//options.target._objects[i].width = (options.target._objects[i].originalObjectsOptions.width * options.target.scaleX);
+						//options.target._objects[i].scaleX = options.target.scaleX * (this.flipX ? -1 : 1);
+						//
+						//options.target._objects[i].top = options.target.top + (options.target._objects[i].originalObjectsOptions.top * (options.target.scaleY));
+						//options.target._objects[i].height = (options.target._objects[i].originalObjectsOptions.height * options.target.scaleY);
+						//options.target._objects[i].scaleY = options.target.scaleY * (this.flipY ? -1 : 1);
+
+
+						options.target._objects[i].left =
+								(((options.target._objects[i].left - options.target.pLeft) + options.target.left) * (options.target.scaleX - options.target.pScaleX));
+
+						options.target._objects[i].top =
+						(((options.target._objects[i].top - options.target.pTop) + options.target.top ) * (options.target.scaleY - options.target.pScaleY));
+
+						options.target._objects[i].scaleX = (options.target._objects[i].scaleX - options.target.pScaleX) + sceneScaleX;
+						options.target._objects[i].scaleY = (options.target._objects[i].scaleY - options.target.pScaleY) + sceneScaleY;
+
+
+					}
+				}
+			}
+		},
+
+		onRotation: function(options) {
+			if (options.target.type === this.type) {
+				//Do Something
+
+				var objectsLength = options.target._objects.length,
+					objects = options.target._objects;
+
+				if ( objectsLength ) {
+
+					var groupAngle = (options.target.angle * (Math.PI / 180));
+
+					for(var i in options.target._objects) {
+
+//						options.target._objects[i].originX = options.target._objects[i].originY = 'center';
+//
+//						var R = Math.sqrt(Math.pow((options.target.left - options.target._objects[i].left), 2) +
+//							Math.pow((options.target.top - options.target._objects[i].top), 2));
+//
+//
+//						var sxCos = (options.target.left * Math.cos(groupAngle)),
+//							sxSin = (options.target.left * Math.sin(groupAngle)),
+//							syCos = (options.target.top * Math.cos(groupAngle)),
+//							sySin = (options.target.top * Math.sin(groupAngle)),
+//							sx = sxCos - sySin,
+//							sy = syCos + sxSin;
+//
+//						var xCos = (options.target._objects[i].left * Math.cos(groupAngle)),
+//							xSin = (options.target._objects[i].left * Math.sin(groupAngle)),
+//							yCos = (options.target._objects[i].top * Math.cos(groupAngle)),
+//							ySin = (options.target._objects[i].top * Math.sin(groupAngle)),
+//							x = (xCos - ySin),
+//							y = (yCos + xSin);
+//
+//
+//						options.target._objects[i].left = x;
+//						options.target._objects[i].top = y;
+
+//						options.target._objects[i].left = (R * Math.cos((groupAngle - options.target.pAngle) + groupAngle)) + options.target.left;
+//						options.target._objects[i].top = (R * Math.sin((groupAngle - options.target.pAngle) + groupAngle)) + options.target.top;
+
+//						options.target._objects[i].angle = options.target.angle;
+					}
+				}
+
+//				console.log('Rotation', this._getLeftTopCoords());
+
+//				console.log('Rotation', options.target.type);
+			}
+		},
+
+		setBackgroundColor: function(color) {
+			this.backgroundColor = color;
+		},
+
+		setBackgroundImage: function(imageSrc) {
+			this.backgroundSrc = imageSrc;
+		},
+
+		setBackgroundSvg: function(svgUrl) {
+
+		},
+
+		/**
+		 * Draw Background Color
+		 */
+		drawBackgroundColor: function(ctx){
+			if ( this.backgroundColor ) {
+				ctx.save();
+				var pClicked = new fabric.Point(this.left, this.top),
+					pLeftTop = new fabric.Point(this.width / 2, this.height /2),
+
+					rotated = fabric.util.rotatePoint(
+						pClicked, pLeftTop, fabric.util.degreesToRadians(this.angle));
+
+				console.log('Scene Rotation leftTop', rotated);
+
+				ctx.rect(rotated.x, rotated.y, this.width * this.scaleX, this.height * this.scaleY);
+				ctx.fillStyle = this.backgroundColor;
+				ctx.fillRect(rotated.x, rotated.y, this.width * this.scaleX, this.height * this.scaleY);
+				ctx.restore();
+			}
+		},
+
+
+		drawBackgroundImage: function(ctx) {
+			if ( this.backgroundSrc ) {
+				var imageObj = new Image();
+
+				imageObj.addEventListener("load", function() {
+					ctx.drawImage(imageObj, this.left, this.top, this.width, this.height);
+				}, false);
+
+				imageObj.src = this.backgroundSrc;
+			}
 		},
 
 		/**
@@ -100,7 +281,12 @@
 			// do not render if object is not visible
 			if (!this.visible) return;
 
+			//Draw Background
+			this.drawBackgroundColor(ctx);
+			this.drawBackgroundImage(ctx);
+
 			ctx.save();
+
 			// the array is now sorted in order of highest first, so start from end
 			this.callSuper('_renderControls', ctx);
 
@@ -126,32 +312,11 @@
 				sceneScaleY = (this.scaleY - this.originalOptions.scaleY);
 
 
-			console.log('Scene Left', this.pLeft);
-
-
 			this.clipTo && fabric.util.clipContext(this, ctx);
+
 
 			for (var i = 0, len = this._objects.length; i < len; i++) {
 				this._objects[i].originalState = {};
-
-				var objectRotatedLeftTop = this._getRotatedLeftTop(this._objects[i]);
-
-
-
-				this._objects[i].left = ((this._objects[i].left - this.pLeft) + sceneOffsetLeft);
-				this._objects[i].top = ((this._objects[i].top - this.pTop) + sceneOffsetTop);
-
-
-				console.log('OBJECT -> '+this._objects[i].type,
-					this._objects[i].left,
-					this._objects[i].top,
-					objectRotatedLeftTop);
-
-
-				this._objects[i].angle = (this._objects[i].angle - this.pAngle) + sceneAngle;
-				this._objects[i].scaleX = (this._objects[i].scaleX - this.pScaleX) + sceneScaleX;
-				this._objects[i].scaleY = (this._objects[i].scaleY - this.pScaleY) + sceneScaleY;
-
 
 				this._objects[i].setCoords();
 				this._objects[i].render(ctx);
@@ -226,3 +391,4 @@
 	fabric.Scene.async = true;
 
 })(typeof exports !== 'undefined' ? exports : this);
+
