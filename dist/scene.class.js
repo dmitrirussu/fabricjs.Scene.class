@@ -372,7 +372,7 @@
 		/**
 		 * Set Animation Delay
 		 * @param delay
-		 * @returns {fabric.SvgAnimation}
+		 * @returns {fabric.Scene}
 		 */
 		setDelay: function(delay) {
 			this.delay = delay;
@@ -384,7 +384,7 @@
 	/**
 	 * Indicates that instances of this type are async
 	 * @static
-	 * @memberOf fabric.SvgAnimation
+	 * @memberOf fabric.Scene
 	 * @type Boolean
 	 * @default
 	 */
