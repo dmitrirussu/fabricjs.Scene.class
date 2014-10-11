@@ -64,5 +64,5 @@ Example of using:
 	};
 
 
-<a href="https://github.com/kangax/fabric.js" ta>Fabric JS</a>
+<a href="https://github.com/dmitrirussu/fabric.js" ta>Fabric JS</a>
 ===
